@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"regexp"
 	"strings"
 	"time"
@@ -67,6 +68,13 @@ func sendPostRequest(chatUrl string, authToken string, bodyBytes []byte) (*http.
 
 	req.Header.Add("Authorization", authToken)
 	req.Header.Add("Content-Type", "application/json")
+
+	// add request debug statement
+	dump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("HTTP Request to Victim:\n", string(dump))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
